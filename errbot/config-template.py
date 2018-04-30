@@ -170,6 +170,8 @@ BOT_IDENTITY = {
 
     ## Slack mode (comment the others above if using this mode)
     # 'token': 'xoxb-4426949411-aEM7...',
+    ## you can also include the proxy for the SlackClient connection
+    # 'proxies': {'http': 'some-http-proxy', 'https': 'some-https-proxy'}
 
     ## Telegram mode (comment the others above if using this mode)
     # 'token': '103419016:AAbcd1234...',
@@ -379,7 +381,7 @@ REVERSE_CHATROOM_RELAY = {}
 #IRC_RECONNECT_ON_KICK = 5  # Reconnect back to a channel after a kick (in seconds)
                             # Put it at None if you don't want the chat to
                             # reconnect
-#IRC_RECONNECT_ON_DISCONNECT = 5  # Reconnect back to a channel after a disconenction (in seconds)
+#IRC_RECONNECT_ON_DISCONNECT = 5  # Reconnect back to a channel after a disconnection (in seconds)
 
 # The pattern to build a user representation from for ACL matches.
 # The default is "{nick}!{user}@{host}" which results in "zoni!zoni@ams1.groenen.me"

@@ -291,6 +291,7 @@ class SlackBackend(ErrBot):
         super().__init__(config)
         identity = config.BOT_IDENTITY
         self.token = identity.get('token', None)
+        self.proxies = identity.get('proxies', None)
         if not self.token:
             log.fatal(
                 'You need to set your token (found under "Bot Integration" on Slack) in '
@@ -359,7 +360,11 @@ class SlackBackend(ErrBot):
         log.debug('Converted bot_alt_prefixes: %s', self.bot_config.BOT_ALT_PREFIXES)
 
     def serve_once(self):
-        self.sc = SlackClient(self.token)
+        if not self.proxies:
+            self.sc = SlackClient(self.token)
+        else:
+            self.sc = SlackClient(self.token, proxies=self.proxies)
+
         log.info("Verifying authentication token")
         self.auth = self.api_call("auth.test", raise_errors=False)
         if not self.auth['ok']:
@@ -408,6 +413,7 @@ class SlackBackend(ErrBot):
             'hello': self._hello_event_handler,
             'presence_change': self._presence_change_event_handler,
             'message': self._message_event_handler,
+            'member_joined_channel': self._member_joined_channel_event_handler,
         }
 
         event_handler = event_handlers.get(event_type)
@@ -530,6 +536,12 @@ class SlackBackend(ErrBot):
 
         if mentioned:
             self.callback_mention(msg, mentioned)
+
+    def _member_joined_channel_event_handler(self, event):
+        """Event handler for the 'member_joined_channel' event"""
+        user = SlackPerson(self.sc, event['user'])
+        if user == self.bot_identifier:
+            self.callback_room_joined(SlackRoom(channelid=event['channel'], bot=self))
 
     def userid_to_username(self, id_):
         """Convert a Slack user ID to their user name"""
